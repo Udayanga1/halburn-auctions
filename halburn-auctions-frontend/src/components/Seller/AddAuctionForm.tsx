@@ -29,6 +29,31 @@ export default function AddAuctionForm() {
     e.preventDefault();
     // onAddAuction(form); // Pass auction to Dashboard
     console.log(form);
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+      "title": form.title,
+      "description": form.description,
+      "price": form.price,
+      "startTime": form.startTime,
+      "endTime": form.endTime,
+      "sellerId": 2,
+      "categoryId": 101,
+      "type": "OPEN"
+    });
+
+    const requestOptions: any = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow"
+    };
+
+    fetch("http://localhost:8080/auction/add", requestOptions)
+      .then((response) => response.text())
+      .then((result) => console.log(result))
+      .catch((error) => console.error(error));
     
     setForm({
       title: "",
