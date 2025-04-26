@@ -1,5 +1,16 @@
+import { AuctionItemProps } from "../../types/AuctionItemProps";
 
-export default function AuctionItem() {
+export default function AuctionItem({
+  title,
+  category,
+  description,
+  price,
+  currentBid,
+  startTime,
+  endTime,
+  sellerId,
+  imageUrl,
+}: AuctionItemProps) {
   return(
     <div className="relative max-w-xs bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden min-w-3xs">
       <img src="#" alt="#" className="w-full h-48 object-cover" />
@@ -12,12 +23,14 @@ export default function AuctionItem() {
       </button>
 
       <div className="p-4">
-        <h3 className="text-lg font-semibold text-gray-900">Green Eyed Cats</h3>
-        <p className="text-sm text-gray-500 mt-1">Pet & Animals</p>
+        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+        <p className="text-sm text-gray-500 mt-1">{category}</p>
 
         <div className="mt-4 text-sm text-gray-700 space-y-2">
-          <p>Starting Price <span className="font-medium">$50.00</span>, Current Bid <span className="font-medium">$60.00</span></p>
-          <p>Bid ends in <span className="font-medium">792 days 18:40:02</span></p>
+          <p>Starting Price <span className="font-medium">Rs {price}</span>, Current Bid <span className="font-medium">Rs {currentBid}</span></p>
+          <p>Seller <span className="font-medium"> {sellerId}</span></p>
+          <p>Bid Start Time <span className="font-medium">{startTime}</span></p>
+          <p>Bid End Time <span className="font-medium">{endTime}</span></p>
         </div>
       </div>
     </div>

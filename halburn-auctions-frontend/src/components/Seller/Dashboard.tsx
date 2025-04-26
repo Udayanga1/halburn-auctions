@@ -1,10 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AuctionItem from "./AuctionItem";
 import AddAuctionForm from "./AddAuctionForm";
+import { Auction } from "../../types/Auction";
 
 export default function Dashboard() {
 
   const [showForm, setShowForm] = useState(false);
+  const [auctions, setAuctions] = useState<Auction[]>([]);
+
+  useEffect(() => {
+    fetch("http://localhost:8080/auction/all")
+      .then((res) => res.json())
+      .then((data: Auction[]) => {
+        console.log(data);
+        
+        setAuctions(data);
+      })
+      .catch((err) => console.error("Error fetching auctions:", err));
+  }, []);
 
   return(
     <div className="flex h-screen bg-gray-100">
@@ -40,11 +53,21 @@ export default function Dashboard() {
           <div className="p-4 bg-white border border-gray-200 rounded-lg">
             <h3 className="text-sm font-semibold text-gray-700 border-l-4 border-violet-500 pl-2">Recent Auctions</h3>
             <div className="flex flex-wrap gap-2">
-              <AuctionItem />
-              <AuctionItem />
-              <AuctionItem />
-              <AuctionItem />
-              <AuctionItem />
+            {auctions.map((item) => (
+              <AuctionItem
+                key={item.id}
+                title={item.title}
+                category={item.category}
+                description={item.description}
+                startPrice={item.price}
+                currentBid={item.currentBid}
+                startTime={item.startTime}
+                sellerId={item.sellerId}
+                endTime={item.endTime}
+                // imageUrl={item.imageUrls[0]}
+                imageUrl=""
+              />
+            ))}
             </div>
           </div>
         </div>
