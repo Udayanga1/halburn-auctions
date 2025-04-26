@@ -35,10 +35,6 @@ public class UserController {
 
     @PostMapping("/signin")
     public ResponseEntity<User> signIn(@RequestBody SignInRequest req) {
-        System.out.println("req in controller: " + req);
-//        return service.authenticate(req.getEmail(), req.getPassword())
-//                .map(ResponseEntity::ok)
-//                .orElse(ResponseEntity.status(401).build());
         Optional<User> user = service.authenticate(req.getEmail(), req.getPassword());
         System.out.println("user received to controller: " + user);
         return user

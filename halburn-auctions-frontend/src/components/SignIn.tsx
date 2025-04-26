@@ -1,7 +1,14 @@
 import { FormEvent, useState } from "react";
 import { SignInForm } from "../types/SignInForm";
+import { User } from "../types/User";
 
-export default function SiginIn() {
+interface SignInForm { email: string; password: string; }
+interface SignInProps {
+  onSignedIn: (user: User) => void;
+  onSwitchToSignUp: () => void;
+}
+
+export default function SignIn({ onSignedIn, onSwitchToSignUp }: SignInProps) {
 
   const [form, setForm] = useState<SignInForm>({ email: '', password: '' });
 
@@ -25,28 +32,15 @@ export default function SiginIn() {
         throw new Error('Sign‑in failed');
       }
 
-      const user = await response.json();
-      console.log('Signed in user:', user);
+      const user:User = await response.json();
+      // console.log('Signed in user:', user);
+      onSignedIn(user);
+
       // e.g. redirect or update UI
     } catch (err) {
       console.error(err);
       alert('Sign‑in failed');
     }
-
-    // fetch('http://localhost:8080/user/signin', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(form)
-    // })
-    // .then((response)=>response.json)
-    // .then((result) => {
-    //   console.log(result);
-    //   alert('Signed in: ' + result.name);
-    // })
-    // .catch((error)=>{
-    //   console.log(error);
-    //   alert('Sign in failed');
-    // })
   };
 
   return (
@@ -93,7 +87,7 @@ export default function SiginIn() {
 
           <p className="mt-10 text-center text-sm/6 text-gray-400">
             Not a member?{' '}
-            <a href="#" className="font-semibold text-violet-500 hover:text-violet-400">
+            <a onClick={onSwitchToSignUp} className="font-semibold text-violet-500 hover:text-violet-400">
               Create a account
             </a>
           </p>

@@ -1,7 +1,20 @@
 import { FormEvent, useState } from "react";
 import { SignUpForm } from "../types/SignUpForm";
 
-export default function SignUp() {
+interface SignUpProps {
+  onSignedUp: () => void;
+  onSwitchToSignIn: () => void;
+}
+
+export default function SignUp({ onSignedUp, onSwitchToSignIn }: SignUpProps) {
+
+  const initialState: SignUpForm = {
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    purpose: '1',
+  };
 
   const [form, setForm] = useState<SignUpForm>({
     name: '',
@@ -28,25 +41,25 @@ export default function SignUp() {
       email: form.email,
       password: form.password,
       purpose: form.purpose === '1' ? 'SELLER' : 'BUYER'
-    };
+    };    
 
-    console.log(payload);
-    
-
-    fetch('http://localhost:8080/user/add', {
+    try {
+      const response = await fetch('http://localhost:8080/user/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      })
-      .then((response)=>response.text)
-      .then((text) => {
-        console.log(text);
-        alert('User created');
-      })
-      .catch((error)=>{
-        console.log(error);
-        alert('Registration failed');
-      })
+      });
+
+      if (!response.ok) throw new Error('Network response was not ok');
+
+      await response.text();
+      alert('User created');
+      setForm(initialState);
+      onSignedUp();
+    } catch (error) {
+      console.error(error);
+      alert('Registration failed');
+    }
   };
 
   return (
@@ -149,7 +162,7 @@ export default function SignUp() {
 
           <p className="mt-10 text-center text-sm/6 text-gray-500">
             Already a member?{' '}
-            <a href="#" className="font-semibold text-violet-500 hover:text-violet-400">
+            <a onClick={onSwitchToSignIn} className="font-semibold text-violet-500 hover:text-violet-400">
               Sign in
             </a>
           </p>

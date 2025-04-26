@@ -1,6 +1,13 @@
 import { useState } from "react";
+import { User } from "../../types/User";
+import { Auction } from "../../types/Auction";
 
-export default function AddAuctionForm() {
+interface AddAuctionFormProps {
+  user: User;
+  onAdd: (newAuction: Auction) => void;
+}
+
+export default function AddAuctionForm( { user, onAdd }: AddAuctionFormProps) {
 
   const [form, setForm] = useState({
     title: "",
@@ -25,45 +32,56 @@ export default function AddAuctionForm() {
     }
   };
 
-  const handleSubmit = (e:any) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // onAddAuction(form); // Pass auction to Dashboard
-    console.log(form);
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
 
-    const raw = JSON.stringify({
-      "title": form.title,
-      "description": form.description,
-      "price": form.price,
-      "startTime": form.startTime,
-      "endTime": form.endTime,
-      "sellerId": 2,
-      "categoryId": 101,
-      "type": "OPEN"
-    });
-
-    const requestOptions: any = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow"
+    const payload = {
+      title: form.title,
+      description: form.description,
+      price: form.price,
+      startTime: form.startTime,
+      endTime: form.endTime,
+      sellerId: user.id,
+      categoryId: 101,
+      type: "OPEN",
     };
 
-    fetch("http://localhost:8080/auction/add", requestOptions)
-      .then((response) => response.text())
-      .then((result) => console.log(result))
-      .catch((error) => console.error(error));
-    
-    setForm({
-      title: "",
-      description: "",
-      price: "",
-      startTime: "",
-      endTime: "",
-      category: "",
-      photos: [],
-    }); // Reset form
+    try {
+      const response = await fetch("http://localhost:8080/auction/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      // Read plain-text response
+      const text = await response.text();
+      console.log("Server response text:", text);
+
+      // Build Auction object manually since backend didn't return JSON
+      const createdAuction: Auction = {
+        id: Date.now(),             // placeholder; ideally backend would return real ID
+        title: form.title,
+        category: form.category,
+        description: form.description,
+        price: Number(form.price),
+        currentBid: Number(form.price),
+        startTime: form.startTime,
+        endTime: form.endTime,
+        sellerId: user.id,
+        imageUrls: [],
+      };
+
+      // Inform parent to update list
+      onAdd(createdAuction);
+
+      // Reset form
+      setForm({ title: "", description: "", price: "", startTime: "", endTime: "", category: "", photos: [] });
+    } catch (err) {
+      console.error("Error adding auction:", err);
+      alert("Failed to add auction");
+    }
   };
 
   return(
